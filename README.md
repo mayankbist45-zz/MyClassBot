@@ -1,6 +1,6 @@
 # MyClassBot
 
-Attends your classes, marks polls, and send greets the teacher as well.
+Attends your classes and mark the polls.
 
 ## Prerequisites
 
