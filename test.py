@@ -67,6 +67,12 @@ def check_for_class(hour):
     return False
 
 
+def greet():
+    driver.switch_to.frame(driver.find_element_by_id('frame'))
+    elem = driver.find_element_by_id('app')
+    print(elem.get_attribute('role'))
+
+
 def do_polls(hour):
     # todo: gonna finish it someday hopefully
     print('Starting poll daemon')
@@ -110,6 +116,7 @@ for i in range(5):
             time.sleep(frequency * 60)
         continue
     if join():
+        greet()
         do_polls(hr)
         break
 # driver.quit()
