@@ -5,10 +5,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-ID = input('Enter username\n')
-PASSWORD = input('Enter password\n')
-PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-frequency = 10
+ID = input('Enter username:\n')
+PASSWORD = input('Enter password:\n')
+# PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
+PATH = input('Enter driver path\n')
+frequency = 3
 
 
 def dec(hour):
@@ -103,7 +104,7 @@ def join():
 
 for iterations in range(10):
     have_class = False
-    for i in range(5):
+    for i in range(10):
         driver = webdriver.Chrome(PATH)
         driver.get("http://myclass.lpu.in")
         do_login(ID, PASSWORD)
