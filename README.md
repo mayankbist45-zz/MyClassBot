@@ -15,20 +15,23 @@ pip install -U selenium
 
 ## Configuration
 
-Change the ID and PASSWORD field to your login ID and Password.
+Enter the ID and PASSWORD field to your login ID and Password.
 Make sure they are correct. 
 Incorrect password is not handled by script right now.
 
 Download chrome web driver according to your chrome version from [here](https://chromedriver.chromium.org/downloads).
-PATH is the path to your downloaded web driver
-
-I suggest putting webdriver in a safe place ;)
+Copy the path of the downloaded webdriver and change this line of code
 
 ```python
-ID = 1181XXXX 
-PASSWORD = 'Something@123'
 PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
 ```
+to this 
+```python
+PATH = "your path here"
+```
+
+I suggest putting webdriver in a safe place ;)
+Make sure your path is correct. Incorrect path may yield unhandled errors.
 
 ## Usage
 
