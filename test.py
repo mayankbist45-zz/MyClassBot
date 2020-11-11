@@ -5,8 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-ID = 1181XXXX
-PASSWORD = 'Something@123'
+ID = 'your username'
+PASSWORD = 'your password'
 PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
 frequency = 3
 
