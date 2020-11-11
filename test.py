@@ -5,8 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-ID =
-PASSWORD =
+ID = 1181XXXX
+PASSWORD = 'Something@123'
 PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
 frequency = 3
 
@@ -67,16 +67,6 @@ def check_for_class(hour):
     return False
 
 
-def greet():
-    driver.switch_to.frame(driver.find_element_by_id('frame'))
-    driver.find_element_by_xpath(
-        '//button[@aria-label="Users and messages toggle with new message notification"]').click()
-    driver.find_element_by_xpath('//div[@aria-label="Public Chat"]').click()
-    driver.find_element_by_id('message-input').send_keys('good afternoon sir')
-    driver.find_element_by_id('message-input').send_keys(Keys.RETURN)
-    driver.switch_to.default_content()
-
-
 def do_polls(hour):
     # todo: gonna finish it someday hopefully
     print('Starting poll daemon')
@@ -97,23 +87,17 @@ def join():
     # todo: gonna finish it tomorrow
     # todo: handle case of no button in here using explicit ways
     # a - role="button"
-    # id="joinCountDown"
-    try:
-        driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
-        time.sleep(7)
-        driver.switch_to.frame(driver.find_element_by_id('frame'))
-        driver.find_element_by_xpath('//button[@aria-label="Listen only"]').send_keys(Keys.RETURN)
-        driver.switch_to.default_content()
-        return True
-    except:
-        print('Failed')
-        return False
+    driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
+    time.sleep(3)
+    driver.switch_to.frame(driver.find_element_by_id('frame'))
+    driver.find_element_by_xpath('//button[@aria-label="Listen only"]').send_keys(Keys.RETURN)
+    driver.switch_to.default_content()
+    return
 
 
 for i in range(5):
     driver = webdriver.Chrome(PATH)
     driver.get("http://myclass.lpu.in")
-    driver.maximize_window()
     do_login(ID, PASSWORD)
     hr = get_time()
     time.sleep(2)
@@ -126,7 +110,6 @@ for i in range(5):
             time.sleep(frequency * 60)
         continue
     if join():
-        # greet()
         do_polls(hr)
-        driver.quit()
         break
+# driver.quit()
