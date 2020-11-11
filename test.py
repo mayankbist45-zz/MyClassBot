@@ -5,10 +5,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-ID = 'your username'
-PASSWORD = 'your password'
+ID = input('Enter username\n')
+PASSWORD = input('Enter password\n')
 PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-frequency = 3
+frequency = 10
 
 
 def dec(hour):
@@ -101,22 +101,27 @@ def join():
     return
 
 
-for i in range(5):
-    driver = webdriver.Chrome(PATH)
-    driver.get("http://myclass.lpu.in")
-    do_login(ID, PASSWORD)
-    hr = get_time()
-    time.sleep(2)
-    have_class = check_for_class(hr)
+for iterations in range(10):
+    have_class = False
+    for i in range(5):
+        driver = webdriver.Chrome(PATH)
+        driver.get("http://myclass.lpu.in")
+        do_login(ID, PASSWORD)
+        hr = get_time()
+        time.sleep(2)
+        have_class = check_for_class(hr)
+        if not have_class:
+            print("No ongoing lectures found at", ryt_now())
+            driver.quit()
+            if i + 1 < 5:
+                print('Sleeping for', frequency, 'minutes')
+                time.sleep(frequency * 60)
+            continue
+        if join():
+            have_class = True
+            # greet()
+            do_polls(hr)
+            driver.quit()
+            break
     if not have_class:
-        print("No ongoing lectures found at", ryt_now())
-        driver.quit()
-        if i + 1 < 5:
-            print('Sleeping for', frequency, 'minutes')
-            time.sleep(frequency * 60)
-        continue
-    if join():
-        greet()
-        do_polls(hr)
-        break
-# driver.quit()
+        time.sleep(15 * 60)
