@@ -1,6 +1,6 @@
 # MyClassBot
 
-Attends your classes and mark the polls.
+Attend your classes and mark the polls hassle-free.
 
 ## Prerequisites
 
