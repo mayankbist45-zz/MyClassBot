@@ -7,8 +7,8 @@ import time
 
 ID = input('Enter username:\n')
 PASSWORD = input('Enter password:\n')
-# PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-PATH = input('Enter driver path\n')
+PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
+# PATH = input('Enter driver path\n')
 frequency = 3
 
 
@@ -94,12 +94,21 @@ def join():
     # todo: gonna finish it tomorrow
     # todo: handle case of no button in here using explicit ways
     # a - role="button"
-    driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
-    time.sleep(3)
-    driver.switch_to.frame(driver.find_element_by_id('frame'))
-    driver.find_element_by_xpath('//button[@aria-label="Listen only"]').send_keys(Keys.RETURN)
-    driver.switch_to.default_content()
-    return
+
+    try:
+        # wait = WebDriverWait(driver, 3600)
+        # wait.until(EC.visibility_of_element_located(By.ID("countDown")))
+        driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
+        time.sleep(3)
+        driver.switch_to.frame(driver.find_element_by_id('frame'))
+        driver.find_element_by_xpath('//button[@aria-label="Listen only"]').send_keys(Keys.RETURN)
+        driver.switch_to.default_content()
+        return True
+    except:
+        driver.quit()
+        print('Join Button not available. Retrying in 3 minutes')
+        time.sleep(3 * 60)
+        return False
 
 
 for iterations in range(10):
