@@ -12,8 +12,8 @@ PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
 frequency = 3
 
 
-def dec(hour):
-    return str(int(hour) - 1)
+def add(hour, val):
+    return str(int(hour) + val)
 
 
 def ryt_now():
@@ -42,29 +42,31 @@ def do_login(username, password):
     message.send_keys(Keys.RETURN)
 
 
+def process_hr(cur_hr, minutes):
+    if int(cur_hr) > 12:
+        cur_hr = str((int(cur_hr) - 12))
+    cur = str((minutes + 60) % 60)
+    if len(cur) < 2:
+        cur = '0' + cur
+    return cur_hr + ':' + cur
+
+
 # check for classes from cur time t in order t - 1, t, t + 1
 # handle false positive of night
 def check_for_class(hour):
     print('Checking for ongoing class')
-    for minutes in range(-15, 31):
-        cur_hr = hour
-        if minutes < 0:
-            cur_hr = dec(cur_hr)
-        if int(cur_hr) > 12:
-            cur_hr = str((int(cur_hr) - 12))
-        cur = (minutes + 60) % 60
-        cur = str(cur)
-        if len(cur) < 2:
-            cur = '0' + cur
-        val = cur_hr + ':' + cur
-        try:
-            path = "//div[@data-start='" + val + "']"
-            current_class = driver.find_element_by_xpath(path)
-            print(val, ' - Class Found')
-            current_class.find_element_by_xpath("./../..").send_keys(Keys.RETURN)
-            return True
-        except:
-            pass
+    for cur_hr in [add(hour, -2), add(hour, -1), hour, add(hour, 1)]:
+        for minutes in range(0, 60):
+            val = process_hr(cur_hr, minutes)
+            # print('Checking class at', val)
+            try:
+                path = "//div[@data-start='" + val + "']"
+                current_class = driver.find_element_by_xpath(path)
+                print(val, ' - Class Found')
+                current_class.find_element_by_xpath("./../..").send_keys(Keys.RETURN)
+                return True
+            except:
+                pass
     return False
 
 
@@ -87,7 +89,6 @@ def do_polls(hour):
             driver.find_element_by_xpath('//button[@aria-labelledby="pollAnswerLabelA"]').click()
         finally:
             pass
-    # driver.find_element_by_xpath().click()
     return
 
 
@@ -108,13 +109,29 @@ def join():
         return False
 
 
+def abort():
+    print('Aborting')
+    driver.quit()
+    exit(0)
+
+
 for iterations in range(10):
     have_class = False
     for i in range(10):
         driver = webdriver.Chrome(PATH)
+        chrome_options = webdriver.ChromeOptions()
+        driver.minimize_window()
+
         driver.get("http://myclass.lpu.in")
-        do_login(ID, PASSWORD)
+        try:
+            do_login(ID, PASSWORD)
+        except:
+            print('Probably your credentials are invalid')
+            abort()
         hr = get_time()
+        if int(hr) >= 17:
+            print('No classes are scheduled after 5 pm')
+            abort()
         time.sleep(2)
         have_class = check_for_class(hr)
         if not have_class:
