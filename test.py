@@ -81,7 +81,6 @@ def greet():
 def do_polls(hour):
     print('Starting poll daemon')
     driver.switch_to.frame(driver.find_element_by_id('frame'))
-    print('Frame switching successful')
     while get_time() <= hour:
         try:
             wait = WebDriverWait(driver, 3600)
@@ -118,9 +117,10 @@ def abort():
 for iterations in range(10):
     have_class = False
     for i in range(10):
-        driver = webdriver.Chrome(PATH)
         chrome_options = webdriver.ChromeOptions()
-        driver.minimize_window()
+        # uncomment line below to hide the class tab
+        # chrome_options.headless = True
+        driver = webdriver.Chrome(PATH, options=chrome_options)
 
         driver.get("http://myclass.lpu.in")
         try:
