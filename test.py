@@ -23,9 +23,7 @@ def ryt_now():
 
 
 def get_time():
-    cur_time = time.localtime()
-    cur_time = time.strftime("%H:%M:%S", cur_time)
-
+    cur_time = ryt_now()
     hour, mn, sec = cur_time.split(':')
     if int(mn) >= 40:
         hour = str((int(hour) + 1))
@@ -44,6 +42,8 @@ def do_login(username, password):
     message.send_keys(Keys.RETURN)
 
 
+# check for classes from cur time t in order t - 1, t, t + 1
+# handle false positive of night
 def check_for_class(hour):
     print('Checking for ongoing class')
     for minutes in range(-15, 31):
@@ -68,14 +68,15 @@ def check_for_class(hour):
     return False
 
 
+# not working
 def greet():
     driver.switch_to.frame(driver.find_element_by_id('frame'))
     elem = driver.find_element_by_id('app')
     print(elem.get_attribute('role'))
 
 
+# done
 def do_polls(hour):
-    # todo: gonna finish it someday hopefully
     print('Starting poll daemon')
     driver.switch_to.frame(driver.find_element_by_id('frame'))
     print('Frame switching successful')
@@ -91,15 +92,11 @@ def do_polls(hour):
 
 
 def join():
-    # todo: gonna finish it tomorrow
-    # todo: handle case of no button in here using explicit ways
-    # a - role="button"
-
     try:
         # wait = WebDriverWait(driver, 3600)
-        # wait.until(EC.visibility_of_element_located(By.ID("countDown")))
+        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))
         driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
-        time.sleep(3)
+        time.sleep(6)
         driver.switch_to.frame(driver.find_element_by_id('frame'))
         driver.find_element_by_xpath('//button[@aria-label="Listen only"]').send_keys(Keys.RETURN)
         driver.switch_to.default_content()
