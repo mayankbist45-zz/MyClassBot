@@ -94,7 +94,7 @@ def do_polls(hour):
 def join():
     try:
         # wait = WebDriverWait(driver, 3600)
-        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))
+        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))niu
         driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
         time.sleep(6)
         driver.switch_to.frame(driver.find_element_by_id('frame'))
@@ -121,8 +121,9 @@ for iterations in range(10):
         # uncomment line below to hide the class tab
         # chrome_options.headless = True
         driver = webdriver.Chrome(PATH, options=chrome_options)
-
+        driver.minimize_window()
         driver.get("http://myclass.lpu.in")
+
         try:
             do_login(ID, PASSWORD)
         except:
