@@ -1,6 +1,7 @@
 # [BETA]My Class Bot
 
-Attend your classes and mark the polls hassle-free.
+Attend your classes and mark the polls hassle-free. Current platforms supported:-
+Codetantra.com
 
 ## Prerequisites
 
