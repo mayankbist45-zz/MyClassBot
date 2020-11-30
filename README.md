@@ -1,4 +1,4 @@
-# [BETA]MyClassBot
+# [BETA]My Class Bot
 
 Attend your classes and mark the polls hassle-free.
 
