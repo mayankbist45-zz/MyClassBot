@@ -1,16 +1,47 @@
+#!/usr/bin/python3
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import requests
+import shutil
+import os
+from termcolor import colored
+import getpass
 
-ID = input('Enter username:\n')
-PASSWORD = input('Enter password:\n')
-PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
+ID = input('[+] Enter username: ')
+print(colored("Note: Password will not be echo...", 'cyan'))
+PASSWORD = getpass.getpass(prompt='[+] Enter password: ')
+url="https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip"
+path=os.path.expanduser("~")+'/'
+filename=url.split("/")[-1]
+new_file=filename.split("_")[0]
+PATH=path+new_file
+
+def checking_system():
+
+    print(colored("[+] Please wait, checking the system", 'cyan'))
+    if os.path.exists(PATH):
+        print(colored("[+] system is upto date", 'green'))
+    else:
+        print(colored("[-] driver is not found", 'red'))
+        download_driver(url, path, filename, new_file)
+
+def download_driver(url, path, filename, new_file):
+    print(colored("[+] please wait, downloading the driver...", 'cyan'))
+    r=requests.get(url, stream=True)
+    with open(filename, "wb") as f:
+        shutil.copyfileobj(r.raw, f)
+    os.system(f"unzip {filename}")
+    os.system(f"mv {new_file} {path}")
+    os.system(f"rm {filename}")
+    print(colored("[+] Successfully downloaded the driver...", 'green'))
+
+checking_system()
 # PATH = input('Enter driver path\n')
 frequency = 3
-
 
 def add(hour, val):
     return str(int(hour) + val)
@@ -131,7 +162,7 @@ for iterations in range(10):
             abort()
         hr = get_time()
         if int(hr) >= 17:
-            print('No classes are scheduled after 5 pm')
+            print(colored('No classes are scheduled after 5 pm', 'red'))
             abort()
         time.sleep(2)
         have_class = check_for_class(hr)
