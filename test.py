@@ -4,11 +4,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+from driver_setup import driver
 
 ID = input('Enter username:\n')
 PASSWORD = input('Enter password:\n')
 # PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-PATH = input('Enter driver path\n')
+PATH =driver()
 frequency = 3
 
 
