@@ -1,24 +1,17 @@
-#!/usr/bin/python3
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import requests
-import shutil
-import os
-from termcolor import colored
-import getpass
 from driver_setup import driver
 
-ID = input('[+] Enter username: ')
-print(colored("Note: Password will not be echo...", 'cyan'))
-PASSWORD = getpass.getpass(prompt='[+] Enter password: ')
-
-# getting path
+ID = input('Enter username:\n')
+PASSWORD = input('Enter password:\n')
+# PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
 PATH =driver()
 frequency = 3
+
 
 def add(hour, val):
     return str(int(hour) + val)
@@ -61,6 +54,7 @@ def process_hr(cur_hr, minutes):
 
 # check for classes from cur time t in order t - 1, t, t + 1
 # handle false positive of night
+# can be more efficient
 def check_for_class(hour):
     print('Checking for ongoing class')
     for cur_hr in [add(hour, -2), add(hour, -1), hour, add(hour, 1)]:
@@ -70,6 +64,9 @@ def check_for_class(hour):
             try:
                 path = "//div[@data-start='" + val + "']"
                 current_class = driver.find_element_by_xpath(path)
+                extra_check = current_class.get_attribute('data-full')
+                if len(extra_check) > 8:
+                    continue
                 print(val, ' - Class Found')
                 current_class.find_element_by_xpath("./../..").send_keys(Keys.RETURN)
                 return True
@@ -86,23 +83,35 @@ def greet():
 
 
 # done
-def do_polls(hour):
+def do_polls():
+    poll_number = 1
     print('Starting poll daemon')
     driver.switch_to.frame(driver.find_element_by_id('frame'))
-    while get_time() <= hour:
+    while True:
         try:
-            wait = WebDriverWait(driver, 3600)
-            wait.until(EC.presence_of_element_located((By.XPATH, '//button[@aria-labelledby="pollAnswerLabelA"]')))
-            driver.find_element_by_xpath('//button[@aria-labelledby="pollAnswerLabelA"]').click()
-        finally:
+            wait = WebDriverWait(driver, 5)
+            element = wait.until(
+                EC.element_to_be_clickable((By.XPATH, '//button[starts-with(@aria-labelledby,"pollAnswerLabel")]')))
+            element.click()
+            print('[+]', poll_number, 'poll marked.')
+            poll_number += 1
+        except:
             pass
-    return
+        try:
+            wait = WebDriverWait(driver, 10)
+            element = wait.until(
+                EC.presence_of_element_located((By.XPATH, '//button[@description="Logs you out of the meeting""]')))
+            print('Class Finished')
+            element.click()
+            return
+        except:
+            pass
 
 
 def join():
     try:
         # wait = WebDriverWait(driver, 3600)
-        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))niu
+        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))
         driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
         time.sleep(6)
         driver.switch_to.frame(driver.find_element_by_id('frame'))
@@ -122,39 +131,34 @@ def abort():
     exit(0)
 
 
-for iterations in range(10):
-    have_class = False
-    for i in range(10):
-        chrome_options = webdriver.ChromeOptions()
-        # uncomment line below to hide the class tab
-        # chrome_options.headless = True
-        driver = webdriver.Chrome(PATH, options=chrome_options)
-        driver.minimize_window()
-        driver.get("http://myclass.lpu.in")
+have_class = False
+while True:
+    chrome_options = webdriver.ChromeOptions()
+    # uncomment line below to hide the class tab
+    # chrome_options.headless = True
+    driver = webdriver.Chrome(PATH, options=chrome_options)
+    # driver.minimize_window()
+    driver.get("http://myclass.lpu.in")
 
-        try:
-            do_login(ID, PASSWORD)
-        except:
-            print(colored('Probably your credentials are invalid', 'red'))
-            abort()
-        hr = get_time()
-        if int(hr) >= 17:
-            print(colored('No classes are scheduled after 5 pm', 'red'))
-            abort()
-        time.sleep(2)
-        have_class = check_for_class(hr)
-        if not have_class:
-            print("No ongoing lectures found at", ryt_now())
-            driver.quit()
-            if i + 1 < 5:
-                print('Sleeping for', frequency, 'minutes')
-                time.sleep(frequency * 60)
-            continue
-        if join():
-            have_class = True
-            # greet()
-            do_polls(hr)
-            driver.quit()
-            break
-    if not have_class:
-        time.sleep(15 * 60)
+    try:
+        do_login(ID, PASSWORD)
+    except:
+        print('Probably your credentials are invalid')
+        abort()
+
+    hr = get_time()
+    if int(hr) >= 20:
+        print('No classes are scheduled after 8 pm')
+        abort()
+
+    have_class = check_for_class(hr)
+
+    if have_class and join():
+        do_polls()
+        driver.quit()
+        print('Class finished, Restarting Daemon For other classes')
+    else:
+        print("No ongoing lectures found at", ryt_now())
+        driver.quit()
+        print('Sleeping for', frequency, 'minutes')
+        time.sleep(frequency * 60)
