@@ -53,6 +53,7 @@ def process_hr(cur_hr, minutes):
 
 # check for classes from cur time t in order t - 1, t, t + 1
 # handle false positive of night
+# can be more efficient
 def check_for_class(hour):
     print('Checking for ongoing class')
     for cur_hr in [add(hour, -2), add(hour, -1), hour, add(hour, 1)]:
@@ -82,19 +83,23 @@ def greet():
 
 # done
 def do_polls():
+    poll_number = 1
     print('Starting poll daemon')
     driver.switch_to.frame(driver.find_element_by_id('frame'))
     while True:
         try:
             wait = WebDriverWait(driver, 5)
-            element = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[starts-with(@aria-labelledby,"pollAnswerLabel")]')))
-            print(element)
+            element = wait.until(
+                EC.element_to_be_clickable((By.XPATH, '//button[starts-with(@aria-labelledby,"pollAnswerLabel")]')))
             element.click()
+            print('[+]', poll_number, 'poll marked.')
+            poll_number += 1
         except:
             pass
         try:
             wait = WebDriverWait(driver, 10)
-            element = wait.until(EC.presence_of_element_located((By.XPATH, '//button[@description="Logs you out of the meeting""]')))
+            element = wait.until(
+                EC.presence_of_element_located((By.XPATH, '//button[@description="Logs you out of the meeting""]')))
             print('Class Finished')
             element.click()
             return
@@ -105,7 +110,7 @@ def do_polls():
 def join():
     try:
         # wait = WebDriverWait(driver, 3600)
-        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))niu
+        # wait.until(EC.visibility_of_element_located(By.ID("//a[@role='button']")))
         driver.find_element_by_class_name('btn').send_keys(Keys.RETURN)
         time.sleep(6)
         driver.switch_to.frame(driver.find_element_by_id('frame'))
@@ -125,39 +130,34 @@ def abort():
     exit(0)
 
 
-for iterations in range(10):
-    have_class = False
-    for i in range(10):
-        chrome_options = webdriver.ChromeOptions()
-        # uncomment line below to hide the class tab
-        # chrome_options.headless = True
-        driver = webdriver.Chrome(PATH, options=chrome_options)
-        # driver.minimize_window()
-        driver.get("http://myclass.lpu.in")
+have_class = False
+while True:
+    chrome_options = webdriver.ChromeOptions()
+    # uncomment line below to hide the class tab
+    # chrome_options.headless = True
+    driver = webdriver.Chrome(PATH, options=chrome_options)
+    # driver.minimize_window()
+    driver.get("http://myclass.lpu.in")
 
-        try:
-            do_login(ID, PASSWORD)
-        except:
-            print('Probably your credentials are invalid')
-            abort()
-        hr = get_time()
-        if int(hr) >= 20:
-            print('No classes are scheduled after 8 pm')
-            abort()
-        time.sleep(2)
-        have_class = check_for_class(hr)
-        if not have_class:
-            print("No ongoing lectures found at", ryt_now())
-            # driver.quit()
-            if i + 1 < 5:
-                print('Sleeping for', frequency, 'minutes')
-                time.sleep(frequency * 60)
-            continue
-        if join():
-            have_class = True
-            # greet()
-            do_polls()
-            driver.quit()
-            print('Sleeping for', frequency, 'minutes')
-    if not have_class:
-        time.sleep(15 * 60)
+    try:
+        do_login(ID, PASSWORD)
+    except:
+        print('Probably your credentials are invalid')
+        abort()
+
+    hr = get_time()
+    if int(hr) >= 20:
+        print('No classes are scheduled after 8 pm')
+        abort()
+
+    have_class = check_for_class(hr)
+
+    if have_class and join():
+        do_polls()
+        driver.quit()
+        print('Class finished, Restarting Daemon For other classes')
+    else:
+        print("No ongoing lectures found at", ryt_now())
+        driver.quit()
+        print('Sleeping for', frequency, 'minutes')
+        time.sleep(frequency * 60)
