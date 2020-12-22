@@ -81,25 +81,25 @@ def greet():
 
 
 # done
-def do_polls(hour):
+def do_polls():
     print('Starting poll daemon')
     driver.switch_to.frame(driver.find_element_by_id('frame'))
-    while get_time() <= hour:
+    while True:
         try:
             wait = WebDriverWait(driver, 5)
             element = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[starts-with(@aria-labelledby,"pollAnswerLabel")]')))
+            print(element)
             element.click()
         except:
             pass
         try:
-            wait = WebDriverWait(driver, 5)
+            wait = WebDriverWait(driver, 10)
             element = wait.until(EC.presence_of_element_located((By.XPATH, '//button[@description="Logs you out of the meeting""]')))
             print('Class Finished')
             element.click()
             return
         except:
             pass
-    return
 
 
 def join():
@@ -141,8 +141,8 @@ for iterations in range(10):
             print('Probably your credentials are invalid')
             abort()
         hr = get_time()
-        if int(hr) >= 17:
-            print('No classes are scheduled after 5 pm')
+        if int(hr) >= 20:
+            print('No classes are scheduled after 8 pm')
             abort()
         time.sleep(2)
         have_class = check_for_class(hr)
@@ -156,7 +156,8 @@ for iterations in range(10):
         if join():
             have_class = True
             # greet()
-            do_polls(hr)
+            do_polls()
             driver.quit()
+            print('Sleeping for', frequency, 'minutes')
     if not have_class:
         time.sleep(15 * 60)
