@@ -1,16 +1,17 @@
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+
 # from driver_setup import driver
-from webdriver_manager.chrome import ChromeDriverManager
 
 ID = input('Enter username:\n')
 PASSWORD = input('Enter password:\n')
-PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-# PATH = driver()
+# PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
+# # PATH = driver()
 frequency = 3
 
 
@@ -87,15 +88,25 @@ def greet():
 def do_polls(hour):
     poll_number = 1
     cur_hour, cur_minutes = hour.split(':')
+    cur_hour = int(cur_hour)
+    cur_minutes = int(cur_minutes)
+    cur_minutes += 5
+    if cur_minutes > 59:
+        cur_hour += 1
+        cur_minutes %= 60
+    cur_hour += 1
     print('Starting poll daemon')
+    print('End time estimated:', cur_hour, cur_minutes)
     driver.switch_to.frame(driver.find_element_by_id('frame'))
-    while cur_minutes != ryt_now().split(':')[1] and cur_hour < ryt_now().split(':')[0]:
+
+    print(ryt_now().split(':')[1], ryt_now().split(':')[0])
+    while cur_minutes != int(ryt_now().split(':')[1]) and cur_hour <= int(ryt_now().split(':')[0]):
         try:
             wait = WebDriverWait(driver, 5)
             element = wait.until(
                 EC.element_to_be_clickable((By.XPATH, '//button[starts-with(@aria-labelledby,"pollAnswerLabel")]')))
             element.click()
-            print('[+]', poll_number, 'poll marked.')
+            print('[+]', poll_number, 'poll(s) marked.')
             poll_number += 1
         except:
             pass
@@ -128,7 +139,7 @@ have_class = False
 while True:
     chrome_options = webdriver.ChromeOptions()
     # uncomment line below to hide the class tab
-    chrome_options.headless = True
+    # chrome_options.headless = True
     # driver = webdriver.Chrome(PATH, options=chrome_options)
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     # driver.minimize_window()
