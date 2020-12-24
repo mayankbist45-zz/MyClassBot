@@ -5,12 +5,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-
 from termcolor import colored
+import stdiomask
 
-
-ID = input('Enter username:\n')
-PASSWORD = input('Enter password:\n')
+ID = input('[+] Enter username:\n')
+PASSWORD = stdiomask.getpass(prompt='[+] Enter password:\n')
 frequency = 3
 
 
@@ -94,7 +93,7 @@ def do_polls(hour):
         cur_hour += 1
         cur_minutes %= 60
     cur_hour += 1
-    print('Starting poll daemon')
+    print(colored('[+] Starting poll daemon', 'green'))
     print('End time estimated:', cur_hour, cur_minutes)
     driver.switch_to.frame(driver.find_element_by_id('frame'))
 
@@ -123,13 +122,13 @@ def join():
         return True
     except:
         driver.quit()
-        print('Join Button not available. Retrying in 3 minutes')
+        print(colored('[-] Join Button not available. Retrying in 3 minutes', 'red', attrs=['reverse', 'blink']))
         time.sleep(3 * 60)
         return False
 
 
 def abort():
-    print('Aborting')
+    print(colored('[-] Aborting', 'red'))
     driver.quit()
     exit(0)
 
@@ -147,12 +146,12 @@ while True:
     try:
         do_login(ID, PASSWORD)
     except:
-        print('Probably your credentials are invalid')
+        print(colored('[-] Probably your credentials are invalid', 'red'))
         abort()
 
     hr = get_time()
     if int(hr) >= 20:
-        print('No classes are scheduled after 8 pm')
+        print(colored('[-] No classes are scheduled after 8 pm', 'cyan', attrs=['reverse', 'blink']))
         abort()
 
     have_class = check_for_class(hr)
@@ -160,7 +159,7 @@ while True:
     if have_class and join():
         do_polls(have_class)
         driver.quit()
-        print('Class finished, Restarting Daemon For other classes')
+        print(colored('[+] Class finished, Restarting Daemon For other classes', 'cyan'))
     else:
         print("No ongoing lectures found at", ryt_now())
         driver.quit()
