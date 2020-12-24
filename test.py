@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from driver_setup import driver
+from termcolor import colored
 
 ID = input('Enter username:\n')
 PASSWORD = input('Enter password:\n')
@@ -56,7 +57,7 @@ def process_hr(cur_hr, minutes):
 # handle false positive of night
 # can be more efficient
 def check_for_class(hour):
-    print('Checking for ongoing class')
+    print(colored('[+] Checking for ongoing class', 'cyan'))
     for cur_hr in [add(hour, -2), add(hour, -1), hour, add(hour, 1)]:
         for minutes in range(0, 60):
             val = process_hr(cur_hr, minutes)
