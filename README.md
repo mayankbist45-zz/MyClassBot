@@ -9,30 +9,10 @@ Codetantra.com
 
 [Google Chrome](https://www.google.com/intl/en_in/chrome/)
 
-Install Selenium
+Install Requirements
 ```bash
-pip install -U selenium
+pip install -r requirements.txt
 ```
-
-## Configuration
-
-Enter the ID and PASSWORD field to your login ID and Password.
-Make sure they are correct. 
-Incorrect password is not handled by script right now.
-
-Download chrome web driver according to your chrome version from [here](https://chromedriver.chromium.org/downloads).
-Copy the path of the downloaded webdriver and change this line of code
-
-```python
-PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-```
-to this 
-```python
-PATH = "your path here"
-```
-
-I suggest putting webdriver in a safe place ;)
-Make sure your path is correct. Incorrect path may yield unhandled errors.
 
 ## Usage
 

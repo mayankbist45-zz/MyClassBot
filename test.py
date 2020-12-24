@@ -1,16 +1,16 @@
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-from driver_setup import driver
+
 from termcolor import colored
+
 
 ID = input('Enter username:\n')
 PASSWORD = input('Enter password:\n')
-# PATH = "/home/blackhawk/tools/webdriver/chrome/chromedriver"
-PATH =driver()
 frequency = 3
 
 
@@ -70,7 +70,7 @@ def check_for_class(hour):
                     continue
                 print(val, ' - Class Found')
                 current_class.find_element_by_xpath("./../..").send_keys(Keys.RETURN)
-                return True
+                return val
             except:
                 pass
     return False
@@ -84,27 +84,29 @@ def greet():
 
 
 # done
-def do_polls():
+def do_polls(hour):
     poll_number = 1
+    cur_hour, cur_minutes = hour.split(':')
+    cur_hour = int(cur_hour)
+    cur_minutes = int(cur_minutes)
+    cur_minutes += 5
+    if cur_minutes > 59:
+        cur_hour += 1
+        cur_minutes %= 60
+    cur_hour += 1
     print('Starting poll daemon')
+    print('End time estimated:', cur_hour, cur_minutes)
     driver.switch_to.frame(driver.find_element_by_id('frame'))
-    while True:
+
+    print(ryt_now().split(':')[1], ryt_now().split(':')[0])
+    while cur_minutes != int(ryt_now().split(':')[1]) and cur_hour <= int(ryt_now().split(':')[0]):
         try:
             wait = WebDriverWait(driver, 5)
             element = wait.until(
                 EC.element_to_be_clickable((By.XPATH, '//button[starts-with(@aria-labelledby,"pollAnswerLabel")]')))
             element.click()
-            print('[+]', poll_number, 'poll marked.')
+            print('[+]', poll_number, 'poll(s) marked.')
             poll_number += 1
-        except:
-            pass
-        try:
-            wait = WebDriverWait(driver, 10)
-            element = wait.until(
-                EC.presence_of_element_located((By.XPATH, '//button[@description="Logs you out of the meeting""]')))
-            print('Class Finished')
-            element.click()
-            return
         except:
             pass
 
@@ -137,7 +139,8 @@ while True:
     chrome_options = webdriver.ChromeOptions()
     # uncomment line below to hide the class tab
     # chrome_options.headless = True
-    driver = webdriver.Chrome(PATH, options=chrome_options)
+    # driver = webdriver.Chrome(PATH, options=chrome_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     # driver.minimize_window()
     driver.get("http://myclass.lpu.in")
 
@@ -155,7 +158,7 @@ while True:
     have_class = check_for_class(hr)
 
     if have_class and join():
-        do_polls()
+        do_polls(have_class)
         driver.quit()
         print('Class finished, Restarting Daemon For other classes')
     else:
