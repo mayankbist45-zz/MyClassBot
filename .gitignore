@@ -2,3 +2,6 @@
 /venv
 /env
 test.spec
+.idea/
+__pycache__/
+build/
