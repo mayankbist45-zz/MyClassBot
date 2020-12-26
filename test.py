@@ -138,7 +138,7 @@ while True:
     chrome_options = webdriver.ChromeOptions()
     # uncomment line below to hide the class tab
     # chrome_options.headless = True
-    # driver = webdriver.Chrome(PATH, options=chrome_options)
+    # chrome_options.add_argument("--mute-audio")
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     # driver.minimize_window()
     driver.get("http://myclass.lpu.in")
@@ -161,7 +161,7 @@ while True:
         driver.quit()
         print(colored('[+] Class finished, Restarting Daemon For other classes', 'cyan'))
     else:
-        print("No ongoing lectures found at", ryt_now())
+        print(colored("[+] No ongoing lectures found at", 'blue'), colored(ryt_now(), 'blue'))
         driver.quit()
-        print('Sleeping for', frequency, 'minutes')
+        print(colored('[+] Sleeping for', 'blue'), colored(frequency, 'blue'), colored('minutes', 'blue'))
         time.sleep(frequency * 60)
