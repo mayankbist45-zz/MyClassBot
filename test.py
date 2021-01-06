@@ -83,22 +83,12 @@ def greet():
 
 
 # done
-def do_polls(hour):
+def do_polls():
     poll_number = 1
-    cur_hour, cur_minutes = hour.split(':')
-    cur_hour = int(cur_hour)
-    cur_minutes = int(cur_minutes)
-    cur_minutes += 5
-    if cur_minutes > 59:
-        cur_hour += 1
-        cur_minutes %= 60
-    cur_hour += 1
     print(colored('[+] Starting poll daemon', 'green'))
-    print('End time estimated:', cur_hour, cur_minutes)
+    # print('End time estimated:', cur_hour)
     driver.switch_to.frame(driver.find_element_by_id('frame'))
-
-    print(ryt_now().split(':')[1], ryt_now().split(':')[0])
-    while cur_minutes != int(ryt_now().split(':')[1]) and cur_hour <= int(ryt_now().split(':')[0]):
+    while True:
         try:
             wait = WebDriverWait(driver, 5)
             element = wait.until(
@@ -108,6 +98,8 @@ def do_polls(hour):
             poll_number += 1
         except:
             pass
+        if int(ryt_now().split(':')[1]) == 5:
+            return
 
 
 def join():
@@ -137,8 +129,8 @@ have_class = False
 while True:
     chrome_options = webdriver.ChromeOptions()
     # uncomment line below to hide the class tab
-    # chrome_options.headless = True
-    # chrome_options.add_argument("--mute-audio")
+    chrome_options.headless = True
+    chrome_options.add_argument("--mute-audio")
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     # driver.minimize_window()
     driver.get("http://myclass.lpu.in")
@@ -157,9 +149,10 @@ while True:
     have_class = check_for_class(hr)
 
     if have_class and join():
-        do_polls(have_class)
+        do_polls()
         driver.quit()
-        print(colored('[+] Class finished, Restarting Daemon For other classes', 'cyan'))
+        time.sleep(60)
+        print(colored('[+] Refreshing Daemon For other classes', 'cyan'))
     else:
         print(colored("[+] No ongoing lectures found at", 'blue'), colored(ryt_now(), 'blue'))
         driver.quit()
